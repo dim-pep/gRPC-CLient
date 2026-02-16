@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package trading;
+
+option go_package = "github.com/dim-pep/gRPC-2/internal/trading;trading";
+
+import "google/protobuf/timestamp.proto";
+
+message Market {
+  string id = 1;
+  string name = 2;
+  bool enabled = 3;
+  google.protobuf.Timestamp deleted_at = 4;
+}
+
+service SpotInstrumentService {
+  rpc ViewMarkets (ViewMarketsRequest) returns (ViewMarketsResponse);
+}
+
+message ViewMarketsRequest {
+  repeated string user_roles = 1;
+}
+
+message ViewMarketsResponse {
+  repeated Market markets = 1;
+}
+
+service OrderService {
+  rpc GetOrderStatus (GetOrderStatusRequest) returns (GetOrderStatusResponse);
+  rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+}
+
+message GetOrderStatusRequest {
+  string order_id = 1;
+  string user_id = 2;
+}
+
+message GetOrderStatusResponse {
+  string status = 1;
+}
+
+message CreateOrderRequest {
+  string user_id = 1;
+  string market_id = 2;
+  string order_type = 3;
+  double price = 4;
+  int64 quantity = 5;
+}
+
+message CreateOrderResponse {
+  string order_id = 1;
+  string status = 2;
+}
