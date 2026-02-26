@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package generated;
+
+option go_package = "github.com/dim-pep/Market/shared/generated;generated";
+
+import "google/protobuf/timestamp.proto";
+
+message Market {
+  string id = 1;
+  string name = 2;
+  bool enabled = 3;
+  repeated string allowed_roles = 4;
+  google.protobuf.Timestamp deleted_at = 5;
+}
+
+service SpotInstrumentService {
+  rpc ViewMarkets (ViewMarketsRequest) returns (ViewMarketsResponse);
+}
+
+message ViewMarketsRequest {
+  repeated string user_roles = 1;
+}
+
+message ViewMarketsResponse {
+  repeated Market markets = 1;
+}

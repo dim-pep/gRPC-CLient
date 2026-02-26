@@ -6,25 +6,27 @@ import (
 	"log"
 	"time"
 
+	"github.com/dim-pep/gRPC-CLient/generated"
 	"github.com/dim-pep/gRPC-CLient/interceptor"
-	"github.com/dim-pep/gRPC-CLient/trading"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
 	conn, err := grpc.NewClient(
-		"localhost:50051",
+		"localhost:8030",
 		grpc.WithUnaryInterceptor(interceptor.XRequestIDUnaryClientInterceptor()),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		log.Fatalf("cannot connect to OrderService: %v", err)
 	}
 	defer conn.Close()
 
-	client := trading.NewOrderServiceClient(conn)
+	client := generated.NewOrderServiceClient(conn)
 
-	req := &trading.CreateOrderRequest{
+	req := &generated.CreateOrderRequest{
 		UserId:    "user-1",
 		MarketId:  "BTC-USD",
 		OrderType: "test",
@@ -32,7 +34,7 @@ func main() {
 		Quantity:  1,
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	resp, err := client.CreateOrder(ctx, req)
@@ -43,7 +45,7 @@ func main() {
 	fmt.Println("Order ID:", resp.OrderId)
 	fmt.Println("Статус:", resp.Status)
 
-	getReq := &trading.GetOrderStatusRequest{
+	getReq := &generated.GetOrderStatusRequest{
 		OrderId: resp.OrderId,
 		UserId:  "user-1",
 	}
